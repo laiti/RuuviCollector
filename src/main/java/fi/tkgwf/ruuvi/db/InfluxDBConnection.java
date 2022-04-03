@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
+import okhttp3.OkHttpClient;
+import okhttp3.OkHttpClient.Builder;
 
 public class InfluxDBConnection implements DBConnection {
 
@@ -37,7 +39,8 @@ public class InfluxDBConnection implements DBConnection {
             int batchSize,
             int batchTime
     ) {
-        influxDB = InfluxDBFactory.connect(url, user, password).setDatabase(database).setRetentionPolicy(retentionPolicy);
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).connectTimeout(30, TimeUnit.SECONDS);
+        influxDB = InfluxDBFactory.connect(url, user, password, builder).setDatabase(database).setRetentionPolicy(retentionPolicy);
         if (gzip) {
             influxDB.enableGzip();
         } else {
